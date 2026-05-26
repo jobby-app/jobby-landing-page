@@ -85,7 +85,20 @@ export function Hero() {
             <motion.a
               href="#waitlist"
               className="rounded-full bg-primary-fixed px-8 py-4 text-center font-title-lg text-on-primary-fixed shadow-[0_0_20px_rgba(204,255,0,0.3)]"
-              whileHover={{ scale: 0.97 }}
+              animate={{
+                y: [0, -8, 0],
+                boxShadow: [
+                  "0 0 20px rgba(204,255,0,0.28)",
+                  "0 14px 34px rgba(204,255,0,0.42)",
+                  "0 0 20px rgba(204,255,0,0.28)",
+                ],
+              }}
+              transition={{
+                duration: 2.8,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              whileHover={{ scale: 1.04, y: -10 }}
               whileTap={{ scale: 0.95 }}
             >
               Zacznij zarabiać
@@ -120,8 +133,8 @@ export function Hero() {
                 key={job.title}
                 className={`glass-panel ghost-border absolute z-20 rounded-3xl p-4 shadow-xl ${
                   job.position === "left"
-                    ? "-left-6 top-28 sm:-left-10 md:-left-14 md:top-32"
-                    : "-right-6 bottom-28 sm:-right-10 md:-right-12 md:bottom-32"
+                    ? "-left-6 top-28 sm:-left-10 md:-left-28 md:top-24 lg:-left-36"
+                    : "-right-6 bottom-28 sm:-right-10 md:-right-28 md:bottom-24 lg:-right-36"
                 }`}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1, y: [0, -12, 0] }}

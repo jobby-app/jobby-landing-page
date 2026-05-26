@@ -128,5 +128,4 @@ export const FOOTER_LINKS = [
   { href: "mailto:support@getjobby.pl", label: "Contact Us" },
 ] as const;
 
-export const APP_SCREENSHOT =
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuAHeYj1UqjTXFgeFHd27tGEzNAGFoVYdR8fFE_cdBz4uCSue56OlaNWHBl7mNYRqZlLq5TbaHqdfFGzSqh49sMsyzW9RoGF7z8pE6geYDiXW5WEnpaceXcrU8UYO987a81KT8baz4JDKCG3mjiR4a8GgM_4KvF8fyUGq3aMdlmf0DhPur-T5ht9L3R3tRHFDWrs_HBJd9bbaoblkUsGOznUg0VfA4jhOaXkv7Jo5CGZaFu-ZTBc33nMTApYDTE52M3y5l4ZG37CdC4";
+export const APP_SCREENSHOT = "/assets/app-mockup.jpg";

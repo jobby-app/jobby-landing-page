@@ -36,7 +36,7 @@ export function ProblemSection() {
                   </>
                 )}
                 <div className="relative z-20">
-                  <Icon name={card.icon} className="mb-4 text-4xl text-error" />
+                  <Icon name={card.icon} className="mb-6 text-6xl text-error md:text-7xl" />
                   <h3 className="mb-2 font-headline-lg text-primary">{card.title}</h3>
                   <p className="font-body-lg text-on-surface-variant">{card.description}</p>
                 </div>
