@@ -122,9 +122,9 @@ export const TRUST_BADGES = [
 ] as const;
 
 export const FOOTER_LINKS = [
-  { href: "#", label: "Privacy Policy" },
-  { href: "#", label: "Terms of Service" },
-  { href: "#", label: "Cookie Policy" },
+  { href: "/privacy-policy", label: "Privacy Policy" },
+  { href: "/terms-of-service", label: "Terms of Service" },
+  { href: "/cookie-policy", label: "Cookie Policy" },
   { href: "mailto:support@getjobby.pl", label: "Contact Us" },
 ] as const;
 

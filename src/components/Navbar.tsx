@@ -21,11 +21,11 @@ export function Navbar() {
         boxShadow: scrolled ? "0 4px 24px rgba(0,0,0,0.25)" : "0 0 0 transparent",
       }}
     >
-      <a href="#" className="flex items-center gap-3" aria-label="Jobby — strona główna">
+      <a href="/" className="flex items-center gap-3" aria-label="Jobby — strona główna">
         <img
           src="/assets/logo.png"
           alt="Jobby"
-          className="h-8 w-auto object-contain"
+          className="h-9 w-auto object-contain md:h-10"
         />
       </a>
 

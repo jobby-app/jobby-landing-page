@@ -14,7 +14,7 @@ export function Footer() {
           <img
             src="/assets/logo.png"
             alt="Jobby"
-            className="h-8 opacity-80 grayscale transition-all hover:opacity-100 hover:grayscale-0"
+            className="h-9 opacity-80 grayscale transition-all hover:opacity-100 hover:grayscale-0 md:h-10"
           />
           <p className="text-on-surface-muted">© 2026 Jobby. Wszelkie prawa zastrzeżone.</p>
         </div>
