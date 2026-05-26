@@ -125,7 +125,7 @@ export const FOOTER_LINKS = [
   { href: "#", label: "Privacy Policy" },
   { href: "#", label: "Terms of Service" },
   { href: "#", label: "Cookie Policy" },
-  { href: "#", label: "Contact Us" },
+  { href: "mailto:support@getjobby.pl", label: "Contact Us" },
 ] as const;
 
 export const APP_SCREENSHOT =

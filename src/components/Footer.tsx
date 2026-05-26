@@ -33,14 +33,25 @@ export function Footer() {
         </Stagger>
 
         <Stagger className="flex gap-4">
-          {["share", "mail"].map((icon) => (
-            <StaggerItem key={icon} variant="scaleIn">
+          {[
+            {
+              icon: "share",
+              href: "https://www.instagram.com/get_jobby/",
+              label: "Instagram",
+            },
+            {
+              icon: "mail",
+              href: "mailto:support@getjobby.pl",
+              label: "Contact Us",
+            },
+          ].map((link) => (
+            <StaggerItem key={link.label} variant="scaleIn">
               <a
-                href="#"
+                href={link.href}
                 className="ghost-border flex h-10 w-10 items-center justify-center rounded-full bg-surface-container text-on-surface-muted transition-all hover:bg-surface-container-high hover:text-primary"
-                aria-label={icon}
+                aria-label={link.label}
               >
-                <Icon name={icon} />
+                <Icon name={link.icon} />
               </a>
             </StaggerItem>
           ))}
