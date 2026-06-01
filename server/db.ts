@@ -24,7 +24,7 @@ export function getPool() {
 }
 
 export async function runMigrations() {
-  const sqlPath = path.join(__dirname, "../db/migrations/001_waitlist.sql");
+  const sqlPath = path.join(process.cwd(), "db/migrations/001_waitlist.sql");
   const sql = await fs.readFile(sqlPath, "utf-8");
   const db = getPool();
   await db.query(sql);
