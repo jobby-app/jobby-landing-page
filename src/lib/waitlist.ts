@@ -1,6 +1,6 @@
 export type WaitlistSignupResult =
   | { ok: true }
-  | { ok: false; error: "duplicate" | "invalid" | "network" | "server" | "consent" };
+  | { ok: false; error: "duplicate" | "invalid" | "network" | "server" | "consent" | "rate_limit" };
 
 const API_URL = import.meta.env.VITE_WAITLIST_API_URL ?? "/api/waitlist";
 
@@ -28,6 +28,10 @@ export async function signupWaitlist(
 
     if (response.status === 409 || data.error === "duplicate") {
       return { ok: false, error: "duplicate" };
+    }
+
+    if (response.status === 429 || data.error === "rate_limit") {
+      return { ok: false, error: "rate_limit" };
     }
 
     if (response.status === 400) {

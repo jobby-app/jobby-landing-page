@@ -1,80 +1,173 @@
-# Jobby Landing Page
+# Jobby — Landing Page
 
-Landing page dla startupu **Jobby** — lokalny feed małych zleceń. Zbudowany w React + Vite + Tailwind CSS. Backend API (Express) + PostgreSQL na **Railway**.
+Marketingowa strona produktowa dla **Jobby**: lokalny feed małych zleceń w okolicy.  
+Frontend (React) + API waitlisty (Express) + PostgreSQL + Resend, hostowane na **Railway**.
+
+**Produkcja:** [getjobby.pl](https://www.getjobby.pl)
+
+---
+
+## Co jest na stronie
+
+- Landing page z sekcjami marketingowymi (Hero, problem, features, trust)
+- **Waitlista** z zgodą RODO i zapisem do bazy
+- Automatyczny mail potwierdzający (Resend)
+- Dokumenty prawne: polityka prywatności, regulamin, polityka cookies
+- Baner cookies (Google Fonts ładowane po zgodzie)
+- Endpoint admina do masowej wysyłki zaproszeń beta
+
+---
+
+## Stack
+
+| Warstwa | Technologia |
+|---------|-------------|
+| Frontend | React 19, TypeScript, Vite 6, Tailwind CSS 4, Framer Motion |
+| Backend | Express 5, Node.js 20+ |
+| Baza | PostgreSQL (Railway) |
+| Maile | Resend |
+| DNS | Cloudflare |
+| Hosting | Railway |
+
+---
+
+## Struktura repozytorium
+
+```
+src/                 # React — komponenty, strony, treści
+server/              # Express API, maile, middleware
+db/migrations/       # SQL (tabela waitlist_signups)
+public/assets/       # Logo, mockup, favicon
+scripts/             # Wysyłka zaproszeń beta (PowerShell / bash)
+railway.toml         # Konfiguracja deployu Railway
+nixpacks.toml        # Build pipeline
+```
+
+---
 
 ## Uruchomienie lokalne
 
+### Wymagania
+
+- Node.js 20+
+- PostgreSQL (np. connection string z Railway)
+
+### Instalacja
+
 ```bash
 npm install
-cp .env.example .env          # uzupełnij DATABASE_URL (Railway → Postgres → Connect)
-npm run dev                   # frontend :5173 + API :3000 (proxy /api)
+cp .env.example .env
 ```
 
-Tylko frontend: `npm run dev:web`  
-Tylko API: `npm run dev:server`
+Uzupełnij `.env` — minimum `DATABASE_URL` i klucze Resend, jeśli testujesz maile.
 
-## Build produkcyjny
+### Dev (frontend + API)
+
+```bash
+npm run dev
+```
+
+- Strona: http://localhost:5173  
+- API: http://localhost:3000 (Vite proxy `/api` → backend)
+
+### Produkcja lokalnie
 
 ```bash
 npm run build
-npm start                     # serwuje dist/ + API na PORT (domyślnie 3000)
+npm start
 ```
 
-## Railway — konfiguracja
+---
 
-### 1. Jeden serwis (strona + API)
+## Zmienne środowiskowe
 
-Repozytorium deployuje się jako Node.js. Railway uruchamia `npm run build` → `npm start`.
+| Zmienna | Wymagane | Opis |
+|---------|----------|------|
+| `DATABASE_URL` | tak (waitlista) | Connection string PostgreSQL |
+| `NODE_ENV` | prod | `production` na Railway |
+| `RESEND_API_KEY` | tak (maile) | Klucz API Resend |
+| `RESEND_FROM_EMAIL` | tak | np. `Jobby <waitlist@getjobby.pl>` |
+| `ADMIN_SECRET` | beta blast | Losowy ciąg 32+ znaków |
+| `SITE_URL` | opcjonalnie | URL strony (logo w mailach), domyślnie `https://www.getjobby.pl` |
+| `PORT` | auto | Ustawia Railway |
 
-1. Połącz repo z Railway.
-2. Dodaj **PostgreSQL** w projekcie — Railway ustawi `DATABASE_URL` automatycznie (Variables → Reference z bazy).
-3. W Variables serwisu www dodaj:
+Szablon: `.env.example`
 
-| Zmienna | Wartość |
-|---------|---------|
-| `DATABASE_URL` | Reference z Postgresa (jeśli nie połączone automatycznie) |
-| `NODE_ENV` | `production` |
-| `RESEND_API_KEY` | Klucz z Resend |
-| `RESEND_FROM_EMAIL` | `Jobby <waitlist@getjobby.pl>` |
-| `ADMIN_SECRET` | Losowy ciąg min. 32 znaki |
+---
 
-4. Deploy — migracja tabeli `waitlist_signups` uruchamia się przy starcie serwera.
+## Deploy na Railway
 
-Frontend woła `/api/waitlist` na tym samym hoście — nie trzeba osobnego `VITE_WAITLIST_API_URL` na produkcji.
+1. Połącz repozytorium z Railway.
+2. Dodaj **PostgreSQL** i podepnij `DATABASE_URL` (Reference) do serwisu www.
+3. Ustaw zmienne z tabeli powyżej.
+4. Deploy: `npm run build` → `npm start` (z `railway.toml`).
+5. Healthcheck: `/api/health`
 
-### 2. Resend (maile z własnej domeny)
+### DNS (Cloudflare)
 
-1. Konto na [resend.com](https://resend.com).
-2. **Domains → Add Domain** → `getjobby.pl`.
-3. Dodaj rekordy DNS (SPF, DKIM) u rejestratora domeny.
-4. Po weryfikacji: API key → Railway Variables.
+- `@` i `www` → CNAME na Railway
+- Rekordy Resend (SPF, DKIM) — **DNS only**, bez proxy
+- Zalecany redirect: `getjobby.pl` → `www.getjobby.pl`
 
-### 3. Zaproszenie do beta
+---
 
-PowerShell:
+## API
+
+| Metoda | Ścieżka | Opis |
+|--------|---------|------|
+| `GET` | `/api/health` | Status serwera i bazy |
+| `POST` | `/api/waitlist` | Zapis na waitlistę (`email`, `consent`) |
+| `POST` | `/api/waitlist/send-beta-invites` | Wysyłka beta (nagłówek `Authorization: Bearer ADMIN_SECRET`) |
+
+### Beta invites (PowerShell)
 
 ```powershell
-$env:API_URL="https://getjobby.pl"
+$env:API_URL="https://www.getjobby.pl"
 $env:ADMIN_SECRET="twoj-sekret"
 .\scripts\send-beta-invites.ps1 -DryRun   # podgląd
 .\scripts\send-beta-invites.ps1            # wysyłka
 ```
 
-## Dane prawne (RODO)
+---
 
-Przed publikacją uzupełnij `src/data/company.ts` — pełna nazwa podmiotu, adres, NIP.
+## Treści i RODO
 
-## Struktura
+Dane podmiotu prawnego (NIP, adres, forma) edytuj w:
 
-- `src/` — React frontend
-- `server/` — Express API (waitlist, beta blast, static w prod)
-- `db/migrations/` — SQL PostgreSQL
-- `scripts/` — wysyłka zaproszeń beta
-- `railway.toml` — konfiguracja deployu
+`src/data/company.ts`
 
-## Technologie
+Treści regulaminów korzystają z tego pliku. Przed publicznym startem warto zweryfikować dokumenty u prawnika.
 
-- React 19 + TypeScript + Vite 6 + Tailwind CSS 4
-- Express 5 + node-postgres (`pg`)
-- Railway (hosting + PostgreSQL)
-- Resend (e-maile transakcyjne)
+---
+
+## Bezpieczeństwo (wdrożone)
+
+- Parametryzowane zapytania SQL (ochrona przed injection)
+- Rate limit na zapis waitlisty (8 prób / 15 min / IP)
+- Bezpieczne porównanie `ADMIN_SECRET` (`timingSafeEqual`)
+- Escape HTML w treści maili (adres użytkownika)
+- Nagłówki: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`
+- Wyłączone `X-Powered-By`
+- Limit body JSON 16 KB
+- Brak sekretów w repozytorium (`.env` w `.gitignore`)
+
+**Nie commituj:** `.env`, kluczy API, haseł do bazy.
+
+---
+
+## Skrypty npm
+
+| Komenda | Działanie |
+|---------|-----------|
+| `npm run dev` | Frontend + API (watch) |
+| `npm run dev:web` | Tylko Vite |
+| `npm run dev:server` | Tylko API |
+| `npm run build` | Build frontend + kompilacja serwera |
+| `npm start` | Serwer produkcyjny |
+| `npm run preview` | Podgląd buildu Vite |
+
+---
+
+## Licencja
+
+Projekt prywatny — Jobby.

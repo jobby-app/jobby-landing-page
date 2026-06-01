@@ -1,3 +1,5 @@
+import { escapeHtml } from "../middleware/security.js";
+
 const BRAND = "Jobby";
 const SITE_URL = (process.env.SITE_URL ?? "https://www.getjobby.pl").replace(/\/$/, "");
 const LOGO_URL = `${SITE_URL}/assets/logo.png`;
@@ -42,12 +44,13 @@ function emailShell(title: string, body: string) {
 }
 
 export function confirmationEmail(email: string) {
+  const safeEmail = escapeHtml(email);
   const body = `
     <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#c4c9ad;">
       Cześć! Potwierdzamy zapis na waitlistę <strong style="color:#ccff00;">${BRAND}</strong>.
     </p>
     <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#c4c9ad;">
-      Twój adres <strong style="color:#ffffff;">${email}</strong> jest na liście. Damy znać, gdy wystartujemy w Twojej okolicy — a wcześniej możesz dostać zaproszenie do beta testów.
+      Twój adres <strong style="color:#ffffff;">${safeEmail}</strong> jest na liście. Damy znać, gdy wystartujemy w Twojej okolicy — a wcześniej możesz dostać zaproszenie do beta testów.
     </p>
     <p style="margin:0;font-size:14px;line-height:1.6;color:#5c5b5b;">
       Nie zapisywałeś/aś się? Zignoruj tę wiadomość lub napisz na ${SUPPORT_EMAIL}.

@@ -11,6 +11,7 @@ const ERROR_MESSAGES = {
   network: "Brak połączenia. Sprawdź internet i spróbuj ponownie.",
   server: "Coś poszło nie tak. Spróbuj za chwilę lub napisz na support@getjobby.pl.",
   consent: "Zaznacz zgodę na przetwarzanie danych, aby dołączyć do waitlisty.",
+  rate_limit: "Zbyt wiele prób. Spróbuj ponownie za chwilę.",
 } as const;
 
 function WaitlistFormInner() {

@@ -2,18 +2,21 @@ import { Router } from "express";
 import { getPool } from "../db.js";
 import { sendEmail } from "../emails/send.js";
 import { betaInviteEmail, confirmationEmail } from "../emails/templates.js";
+import { getClientIp, safeCompareSecret, signupRateLimit } from "../middleware/security.js";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_EMAIL_LENGTH = 254;
 const BATCH_SIZE = 50;
 const BATCH_DELAY_MS = 1000;
 
 export const waitlistRouter = Router();
 
-waitlistRouter.post("/", async (req, res) => {
+waitlistRouter.post("/", signupRateLimit, async (req, res) => {
   try {
     const email = String(req.body.email ?? "")
       .trim()
-      .toLowerCase();
+      .toLowerCase()
+      .slice(0, MAX_EMAIL_LENGTH);
     const consent = req.body.consent === true;
 
     if (!consent) {
@@ -27,10 +30,7 @@ waitlistRouter.post("/", async (req, res) => {
     }
 
     const db = getPool();
-    const clientIp =
-      (typeof req.headers["x-forwarded-for"] === "string"
-        ? req.headers["x-forwarded-for"].split(",")[0]?.trim()
-        : null) ?? req.ip;
+    const clientIp = getClientIp(req);
 
     const existing = await db.query(
       "select id from waitlist_signups where lower(email) = $1 limit 1",
@@ -71,9 +71,9 @@ waitlistRouter.post("/", async (req, res) => {
 
 waitlistRouter.post("/send-beta-invites", async (req, res) => {
   const adminSecret = process.env.ADMIN_SECRET;
-  const token = req.headers.authorization?.replace(/^Bearer\s+/i, "");
+  const token = req.headers.authorization?.replace(/^Bearer\s+/i, "") ?? "";
 
-  if (!adminSecret || token !== adminSecret) {
+  if (!adminSecret || !safeCompareSecret(token, adminSecret)) {
     res.status(401).json({ error: "unauthorized" });
     return;
   }
@@ -100,7 +100,7 @@ waitlistRouter.post("/send-beta-invites", async (req, res) => {
 
     const { subject, html } = betaInviteEmail();
     let sent = 0;
-    const failed: string[] = [];
+    let failed = 0;
     const invitedIds: string[] = [];
 
     for (let i = 0; i < rows.length; i += BATCH_SIZE) {
@@ -112,7 +112,7 @@ waitlistRouter.post("/send-beta-invites", async (req, res) => {
           sent += 1;
           invitedIds.push(signup.id);
         } else {
-          failed.push(signup.email);
+          failed += 1;
         }
       }
 
@@ -128,12 +128,7 @@ waitlistRouter.post("/send-beta-invites", async (req, res) => {
       );
     }
 
-    res.json({
-      ok: true,
-      sent,
-      failed: failed.length,
-      failed_emails: failed.slice(0, 10),
-    });
+    res.json({ ok: true, sent, failed });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "server" });

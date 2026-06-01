@@ -3,6 +3,7 @@ import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { closePool, runMigrations } from "./db.js";
+import { securityHeaders } from "./middleware/security.js";
 import { waitlistRouter } from "./routes/waitlist.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -12,7 +13,9 @@ const distPath = path.join(__dirname, "../dist");
 
 const app = express();
 app.set("trust proxy", 1);
-app.use(express.json());
+app.disable("x-powered-by");
+app.use(securityHeaders);
+app.use(express.json({ limit: "16kb" }));
 
 let dbReady = false;
 
