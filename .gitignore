@@ -2,6 +2,7 @@ node_modules
 dist
 dist-ssr
 server-dist
+.ai-context
 *.local
 .env
 .env.local

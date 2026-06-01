@@ -3,7 +3,7 @@
 Marketingowa strona produktowa dla **Jobby**: lokalny feed małych zleceń w okolicy.  
 Frontend (React) + API waitlisty (Express) + PostgreSQL + Resend, hostowane na **Railway**.
 
-**Produkcja:** [getjobby.pl](https://www.getjobby.pl)
+**Produkcja:** [www.getjobby.pl](https://www.getjobby.pl)
 
 ---
 
@@ -165,6 +165,30 @@ Treści regulaminów korzystają z tego pliku. Przed publicznym startem warto zw
 | `npm run build` | Build frontend + kompilacja serwera |
 | `npm start` | Serwer produkcyjny |
 | `npm run preview` | Podgląd buildu Vite |
+
+---
+
+## DNS (apex + www)
+
+Instrukcja Cloudflare + Railway: [docs/APEX-CLOUDFLARE.md](docs/APEX-CLOUDFLARE.md)
+
+---
+
+## Gotowość do promocji (checklist)
+
+| Element | Status |
+|---------|--------|
+| Landing + waitlista + API | Gotowe |
+| Maile potwierdzające (Resend) | Gotowe |
+| RODO (checkbox + dokumenty) | Gotowe |
+| Baner cookies | Gotowe |
+| Deploy Railway + Postgres | Gotowe |
+| `www.getjobby.pl` | Gotowe |
+| Apex `getjobby.pl` | Dokończ DNS (TXT verify) → Active w Railway |
+| Dane firmy w `src/data/company.ts` | Uzupełnij przed większą reklamą |
+| Korekta prawna dokumentów | Zalecane przed skalą, nie blokuje startu |
+
+**Na ten moment możesz promować waitlistę** pod `https://www.getjobby.pl` i przejść do innych tematów (apka, marketing, content). Landing nie wymaga dalszej pracy technicznej, chyba że dodajesz analytics, A/B testy lub nowe sekcje.
 
 ---
 
