@@ -1,11 +1,19 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import pg from "pg";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
 let pool: pg.Pool | null = null;
+
+function resolveSsl(connectionString: string): pg.PoolConfig["ssl"] {
+  if (process.env.NODE_ENV !== "production") return undefined;
+
+  const lower = connectionString.toLowerCase();
+  if (lower.includes("sslmode=disable") || lower.includes(".railway.internal")) {
+    return undefined;
+  }
+
+  return { rejectUnauthorized: false };
+}
 
 export function getPool() {
   const connectionString = process.env.DATABASE_URL;
@@ -16,7 +24,8 @@ export function getPool() {
   if (!pool) {
     pool = new pg.Pool({
       connectionString,
-      ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined,
+      ssl: resolveSsl(connectionString),
+      connectionTimeoutMillis: 10_000,
     });
   }
 

@@ -7,14 +7,17 @@ import { waitlistRouter } from "./routes/waitlist.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT ?? 3000);
+const HOST = "0.0.0.0";
 const distPath = path.join(__dirname, "../dist");
 
 const app = express();
 app.set("trust proxy", 1);
 app.use(express.json());
 
+let dbReady = false;
+
 app.get("/api/health", (_req, res) => {
-  res.json({ ok: true });
+  res.status(200).json({ ok: true, db: dbReady });
 });
 
 app.use("/api/waitlist", waitlistRouter);
@@ -22,7 +25,7 @@ app.use("/api/waitlist", waitlistRouter);
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(distPath));
 
-  app.get("*", (req, res, next) => {
+  app.get("{*path}", (req, res, next) => {
     if (req.path.startsWith("/api")) {
       next();
       return;
@@ -31,16 +34,25 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-async function start() {
+async function initDatabase() {
   if (!process.env.DATABASE_URL) {
-    console.error("DATABASE_URL is required");
-    process.exit(1);
+    console.warn("DATABASE_URL is not set — waitlist API will not work");
+    return;
   }
 
-  await runMigrations();
+  try {
+    await runMigrations();
+    dbReady = true;
+    console.log("Database migrations complete");
+  } catch (error) {
+    console.error("Database migration failed:", error);
+  }
+}
 
-  app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
+async function start() {
+  app.listen(PORT, HOST, () => {
+    console.log(`Server listening on ${HOST}:${PORT}`);
+    void initDatabase();
   });
 }
 

@@ -5,5 +5,5 @@ buildCommand = "npm run build"
 [deploy]
 startCommand = "node server-dist/index.js"
 healthcheckPath = "/api/health"
-healthcheckTimeout = 120
+healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
