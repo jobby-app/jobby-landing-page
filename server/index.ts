@@ -17,6 +17,15 @@ app.disable("x-powered-by");
 app.use(securityHeaders);
 app.use(express.json({ limit: "16kb" }));
 
+// Apex → www (gdy obie domeny wskazują na Railway)
+app.use((req, res, next) => {
+  if (req.hostname === "getjobby.pl") {
+    res.redirect(301, `https://www.getjobby.pl${req.originalUrl}`);
+    return;
+  }
+  next();
+});
+
 let dbReady = false;
 
 app.get("/api/health", (_req, res) => {
@@ -28,14 +37,14 @@ app.use("/api/waitlist", waitlistRouter);
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(distPath));
 
-  app.get("{*path}", (req, res, next) => {
-    if (req.path.startsWith("/api")) {
-      next();
-      return;
-    }
+  app.get(/^(?!\/api).*/, (req, res) => {
     res.sendFile(path.join(distPath, "index.html"));
   });
 }
+
+app.use("/api", (_req, res) => {
+  res.status(404).json({ error: "not_found" });
+});
 
 async function initDatabase() {
   if (!process.env.DATABASE_URL) {
