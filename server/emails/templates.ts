@@ -1,6 +1,20 @@
 const BRAND = "Jobby";
-const WEBSITE = "https://getjobby.pl";
+const SITE_URL = (process.env.SITE_URL ?? "https://www.getjobby.pl").replace(/\/$/, "");
+const LOGO_URL = `${SITE_URL}/assets/logo.png`;
 const SUPPORT_EMAIL = "support@getjobby.pl";
+
+function emailHeader() {
+  return `
+    <a href="${SITE_URL}" style="display:inline-block;text-decoration:none;">
+      <img
+        src="${LOGO_URL}"
+        alt="${BRAND}"
+        width="140"
+        height="40"
+        style="display:block;height:40px;width:auto;max-width:140px;border:0;outline:none;"
+      />
+    </a>`;
+}
 
 function emailShell(title: string, body: string) {
   return `<!DOCTYPE html>
@@ -11,10 +25,12 @@ function emailShell(title: string, body: string) {
     <tr><td align="center">
       <table width="100%" style="max-width:520px;background:#111415;border-radius:24px;border:1px solid #2c2f30;padding:40px 32px;">
         <tr><td>
-          <p style="margin:0 0 8px;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#c3f400;">${BRAND}</p>
-          <h1 style="margin:0 0 20px;font-size:24px;line-height:1.3;color:#ffffff;">${title}</h1>
+          <div style="margin:0 0 24px;text-align:center;">
+            ${emailHeader()}
+          </div>
+          <h1 style="margin:0 0 20px;font-size:24px;line-height:1.3;color:#ffffff;text-align:center;">${title}</h1>
           ${body}
-          <p style="margin:32px 0 0;font-size:13px;line-height:1.6;color:#5c5b5b;">
+          <p style="margin:32px 0 0;font-size:13px;line-height:1.6;color:#5c5b5b;text-align:center;">
             Masz pytania? Napisz na <a href="mailto:${SUPPORT_EMAIL}" style="color:#c3f400;">${SUPPORT_EMAIL}</a>
           </p>
         </td></tr>
@@ -51,7 +67,7 @@ export function betaInviteEmail() {
       Jako jeden z pierwszych możesz przetestować lokalny feed małych zleceń. Pobierz aplikację i zaloguj się tym samym adresem e-mail, którego użyłeś/aś na waitliście.
     </p>
     <p style="margin:0 0 24px;text-align:center;">
-      <a href="${WEBSITE}" style="display:inline-block;background:#c3f400;color:#161f00;font-weight:700;text-decoration:none;padding:14px 28px;border-radius:999px;font-size:16px;">
+      <a href="${SITE_URL}" style="display:inline-block;background:#c3f400;color:#161f00;font-weight:700;text-decoration:none;padding:14px 28px;border-radius:999px;font-size:16px;">
         Wejdź do beta
       </a>
     </p>
