@@ -1,4 +1,6 @@
+import { Link } from "react-router-dom";
 import { FOOTER_LINKS } from "../data/content";
+import { COMPANY } from "../data/company";
 import { Icon } from "./Icon";
 import { ScrollReveal } from "./scroll/ScrollReveal";
 import { Stagger, StaggerItem } from "./scroll/Stagger";
@@ -16,18 +18,36 @@ export function Footer() {
             alt="Jobby"
             className="h-9 opacity-80 grayscale transition-all hover:opacity-100 hover:grayscale-0 md:h-10"
           />
-          <p className="text-on-surface-muted">© 2026 Jobby. Wszelkie prawa zastrzeżone.</p>
+          <p className="text-on-surface-muted">© 2026 {COMPANY.brand}. Wszelkie prawa zastrzeżone.</p>
+          <p className="max-w-xs text-center text-xs text-on-surface-muted/80 md:text-left">
+            {COMPANY.legalName.startsWith("[") ? (
+              <>Dane podmiotu prawnego — uzupełnij w pliku <code className="text-primary-fixed/80">src/data/company.ts</code></>
+            ) : (
+              <>
+                {COMPANY.legalName}, {COMPANY.address}, NIP: {COMPANY.nip}
+              </>
+            )}
+          </p>
         </div>
 
         <Stagger className="flex flex-wrap justify-center gap-6">
           {FOOTER_LINKS.map((link) => (
             <StaggerItem key={link.label} variant="fadeIn">
-              <a
-                href={link.href}
-                className="text-on-surface-muted transition-colors hover:text-primary-fixed"
-              >
-                {link.label}
-              </a>
+              {link.href.startsWith("mailto:") ? (
+                <a
+                  href={link.href}
+                  className="text-on-surface-muted transition-colors hover:text-primary-fixed"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  to={link.href}
+                  className="text-on-surface-muted transition-colors hover:text-primary-fixed"
+                >
+                  {link.label}
+                </Link>
+              )}
             </StaggerItem>
           ))}
         </Stagger>
@@ -42,7 +62,7 @@ export function Footer() {
             {
               icon: "mail",
               href: "mailto:support@getjobby.pl",
-              label: "Contact Us",
+              label: "Kontakt",
             },
           ].map((link) => (
             <StaggerItem key={link.label} variant="scaleIn">

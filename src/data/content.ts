@@ -122,10 +122,10 @@ export const TRUST_BADGES = [
 ] as const;
 
 export const FOOTER_LINKS = [
-  { href: "/privacy-policy", label: "Privacy Policy" },
-  { href: "/terms-of-service", label: "Terms of Service" },
-  { href: "/cookie-policy", label: "Cookie Policy" },
-  { href: "mailto:support@getjobby.pl", label: "Contact Us" },
+  { href: "/privacy-policy", label: "Polityka prywatności" },
+  { href: "/terms-of-service", label: "Regulamin" },
+  { href: "/cookie-policy", label: "Polityka cookies" },
+  { href: "mailto:support@getjobby.pl", label: "Kontakt" },
 ] as const;
 
 export const APP_SCREENSHOT = "/assets/app-mockup.jpg";

@@ -1,5 +1,6 @@
 import { Footer } from "./components/Footer";
 import { Navbar } from "./components/Navbar";
+import { CookieBanner } from "./components/CookieBanner";
 import { Route, Routes } from "react-router-dom";
 import { LandingPage } from "./pages/LandingPage";
 import { CookiePolicy } from "./pages/legal/CookiePolicy";
@@ -19,6 +20,7 @@ export default function App() {
         </Routes>
       </main>
       <Footer />
+      <CookieBanner />
     </>
   );
 }

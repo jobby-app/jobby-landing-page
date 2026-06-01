@@ -1,22 +1,45 @@
 import { motion } from "framer-motion";
 import { type FormEvent, useState } from "react";
+import { Link } from "react-router-dom";
+import { COMPANY } from "../data/company";
+import { signupWaitlist } from "../lib/waitlist";
 import { AnimatedSection } from "./AnimatedSection";
 import { ScrollReveal } from "./scroll/ScrollReveal";
 
-type FormState = "idle" | "submitting" | "success";
+type FormState = "idle" | "submitting" | "success" | "error";
+
+const ERROR_MESSAGES = {
+  duplicate: "Ten adres e-mail jest już na liście oczekujących.",
+  invalid: "Podaj prawidłowy adres e-mail.",
+  network: "Brak połączenia. Sprawdź internet i spróbuj ponownie.",
+  server: "Coś poszło nie tak. Spróbuj za chwilę lub napisz na support@getjobby.pl.",
+  consent: "Zaznacz zgodę na przetwarzanie danych, aby dołączyć do waitlisty.",
+} as const;
 
 export function Waitlist() {
   const [email, setEmail] = useState("");
+  const [consent, setConsent] = useState(false);
   const [state, setState] = useState<FormState>("idle");
+  const [errorKey, setErrorKey] = useState<keyof typeof ERROR_MESSAGES | null>(null);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!email.trim()) return;
 
     setState("submitting");
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setState("success");
-    setEmail("");
+    setErrorKey(null);
+
+    const result = await signupWaitlist(email, consent);
+
+    if (result.ok) {
+      setState("success");
+      setEmail("");
+      setConsent(false);
+      return;
+    }
+
+    setErrorKey(result.error);
+    setState("error");
   };
 
   return (
@@ -45,32 +68,60 @@ export function Waitlist() {
             >
               <p className="font-title-lg text-neon-glow">Dziękujemy! Jesteś na liście.</p>
               <p className="mt-2 font-body-lg text-on-surface-muted">
-                Damy znać, gdy Jobby wystartuje w Twojej okolicy.
+                Sprawdź skrzynkę — wysłaliśmy potwierdzenie na podany adres e-mail.
               </p>
             </motion.div>
           ) : (
-            <form
-              className="flex flex-col gap-4 sm:flex-row"
-              onSubmit={handleSubmit}
-            >
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Twój adres e-mail"
-                disabled={state === "submitting"}
-                className="ghost-border flex-1 rounded-full border-none bg-surface-deep px-6 py-4 font-body-lg text-primary transition-all placeholder:text-on-surface-muted focus:bg-surface-container focus:ring-1 focus:ring-primary-fixed focus:outline-none disabled:opacity-60"
-              />
-              <motion.button
-                type="submit"
-                disabled={state === "submitting"}
-                className="rounded-full bg-primary-fixed px-8 py-4 font-title-lg whitespace-nowrap text-on-primary-fixed disabled:opacity-70"
-                whileHover={{ scale: 0.97 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {state === "submitting" ? "Zapisuję…" : "Dołącz do waitlisty"}
-              </motion.button>
+            <form className="space-y-4 text-left" onSubmit={handleSubmit}>
+              <div className="flex flex-col gap-4 sm:flex-row">
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Twój adres e-mail"
+                  disabled={state === "submitting"}
+                  className="ghost-border flex-1 rounded-full border-none bg-surface-deep px-6 py-4 font-body-lg text-primary transition-all placeholder:text-on-surface-muted focus:bg-surface-container focus:ring-1 focus:ring-primary-fixed focus:outline-none disabled:opacity-60"
+                />
+                <motion.button
+                  type="submit"
+                  disabled={state === "submitting" || !consent}
+                  className="rounded-full bg-primary-fixed px-8 py-4 font-title-lg whitespace-nowrap text-on-primary-fixed disabled:opacity-70"
+                  whileHover={{ scale: 0.97 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {state === "submitting" ? "Zapisuję…" : "Dołącz do waitlisty"}
+                </motion.button>
+              </div>
+
+              <label className="flex cursor-pointer items-start gap-3 px-2">
+                <input
+                  type="checkbox"
+                  checked={consent}
+                  onChange={(e) => setConsent(e.target.checked)}
+                  disabled={state === "submitting"}
+                  className="mt-1 h-4 w-4 shrink-0 rounded border-surface-container-high accent-primary-fixed"
+                />
+                <span className="font-body-md text-on-surface-muted">
+                  Wyrażam zgodę na przetwarzanie mojego adresu e-mail w celu zapisu na waitlistę
+                  oraz otrzymywania informacji o starcie {COMPANY.brand}, w tym zaproszenia do beta testów.
+                  Zapoznałem/am się z{" "}
+                  <Link to="/privacy-policy" className="text-primary-fixed hover:underline">
+                    Polityką prywatności
+                  </Link>{" "}
+                  i{" "}
+                  <Link to="/terms-of-service" className="text-primary-fixed hover:underline">
+                    Regulaminem
+                  </Link>
+                  . Zgodę mogę wycofać w dowolnym momencie.
+                </span>
+              </label>
+
+              {state === "error" && errorKey && (
+                <p className="px-2 font-body-md text-error" role="alert">
+                  {ERROR_MESSAGES[errorKey]}
+                </p>
+              )}
             </form>
           )}
 

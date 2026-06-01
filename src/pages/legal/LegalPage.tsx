@@ -12,7 +12,7 @@ export function LegalPage({ title, children }: LegalPageProps) {
       <div className="mx-auto w-full max-w-4xl">
         <ScrollReveal variant="fadeUp" as="div" className="space-y-6">
           <h1 className="font-title-xl text-on-surface">{title}</h1>
-          <div className="prose prose-invert max-w-none text-on-surface-muted">{children}</div>
+          <div className="space-y-8 text-on-surface-muted">{children}</div>
         </ScrollReveal>
       </div>
     </section>
